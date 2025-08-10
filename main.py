@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import requests
 
 load_dotenv()
-logging.basicConfig(level=logging)
+logging.basicConfig(level=logging.DEBUG)
 
 # Load environment variables
 API_KEY = os.getenv("API_KEY")
@@ -52,8 +52,8 @@ class Job:
         self.schedule = schedule
 
     def schedule_market_jobs(self):
-        start_time = datetime.strptime("18:00", "%H:%M")
-        end_time = datetime.strptime("19:30", "%H:%M")
+        start_time = datetime.strptime("09:15", "%H:%M")
+        end_time = datetime.strptime("15:30", "%H:%M")
         current = start_time
         while current <= end_time:
             # Schedule the job every 30 minutes
@@ -62,7 +62,7 @@ class Job:
             )
 
             print(f"Scheduling job at {current.strftime('%H:%M')}")
-            current += timedelta(minutes=5)
+            current += timedelta(minutes=30)
 
     def run(self):
         while True:
