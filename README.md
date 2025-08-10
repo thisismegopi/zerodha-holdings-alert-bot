@@ -4,6 +4,7 @@
 
 -   [UV](https://docs.astral.sh/uv/getting-started/installation/) Python package and project manager
 -   Python 3.10 or higher
+-   Create a App in [Kite Connect](https://developers.kite.trade/apps)
 
 ## 🛠️ Installation
 
