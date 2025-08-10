@@ -11,7 +11,7 @@
 
     ```bash
     $ git clone https://github.com/thisismegopi/zerodha-holdings-alert-bot.git
-    $ cd nse_utility_reports
+    $ cd zerodha-holdings-alert-bot
     ```
 
 2. **Install dependencies using uv:**
