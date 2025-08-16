@@ -43,7 +43,13 @@ class Kite:
 
             self.kite.set_access_token(t)
             print("\nKite Connect initialized successfully.")
-            # print(f"\nAccess Token: {self.kite.access_token}")
+            print(f"\nAccess Token: {self.kite.access_token}")
+
+        try:
+            self.kite.profile()
+            print("\nConnected to Kite Connect successfully!")
+        except Exception as e:
+            raise Exception(f"Failed to connect to Kite Connect: {str(e)}")
 
 
 class Job:
@@ -52,8 +58,8 @@ class Job:
         self.schedule = schedule
 
     def schedule_market_jobs(self):
-        start_time = datetime.strptime("09:15", "%H:%M")
-        end_time = datetime.strptime("15:30", "%H:%M")
+        start_time = datetime.strptime("09:00", "%H:%M")
+        end_time = datetime.strptime("16:00", "%H:%M")
         current = start_time
         while current <= end_time:
             # Schedule the job every 30 minutes
@@ -78,35 +84,45 @@ kite = Kite(
 )
 
 
-def runner_function():
-    print(f"Running task at {datetime.now().strftime('%H:%M:%S')}")
-    holdings = kite.kite.holdings()
+def gainers_losers_alert():
+    try:
+        print(f"Running task at {datetime.now().strftime('%H:%M:%S')}")
+        holdings = kite.kite.holdings()
 
-    sorted_holdings = sorted(
-        holdings, key=lambda x: x["day_change_percentage"], reverse=True
-    )
-    top_5 = sorted_holdings[:5]  # Top 5 highest scoring
-    bottom_5 = sorted_holdings[-5:]  # Last 5 lowest scoring
+        sorted_holdings = sorted(
+            holdings, key=lambda x: x["day_change_percentage"], reverse=True
+        )
+        top_5 = sorted_holdings[:5]  # Top 5 highest scoring
+        bottom_5 = sorted(
+            sorted_holdings[-5:],
+            key=lambda x: x["day_change_percentage"],
+            reverse=False,
+        )  # Last 5 lowest scoring
 
-    text = f"Your holdings as of {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        text = f"Your holdings as of {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
 
-    text += "📈 *Top 5 Gainers* 📈\n\n"
-    for holding in top_5:
-        text += f"🟢 {holding['tradingsymbol']}: `{round(holding['day_change_percentage'], 2)}%`\n"
+        text += "📈 *Top 5 Gainers* 📈\n\n"
+        for holding in top_5:
+            text += f"🟢 {holding['tradingsymbol']}: `{round(holding['day_change_percentage'], 2)}%`|`{round(holding['day_change'], 2)}`\n"
 
-    text += "\n📉 *Top 5 Loosers* 📉\n\n"
-    for holding in bottom_5:
-        text += f"🔴 {holding['tradingsymbol']}: `{round(holding['day_change_percentage'], 2)}%`\n"
+        text += "\n📉 *Top 5 Loosers* 📉\n\n"
+        for holding in bottom_5:
+            text += f"🔴 {holding['tradingsymbol']}: `{round(holding['day_change_percentage'], 2)}%`|`{round(holding['day_change'], 2)}`\n"
 
-    data = requests.get(
-        f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={text}&parse_mode=Markdown"
-    )
-    if data.status_code == 200:
-        print("Message sent successfully!")
-    else:
-        print(f"Failed to send message. Status code: {data.status_code}")
+        data = requests.get(
+            f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={text}&parse_mode=Markdown"
+        )
+        if data.status_code == 200:
+            print("Message sent successfully!")
+        else:
+            raise Exception(f"Failed to send message. Status code: {data.status_code}")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
 
-job = Job(runner_function=runner_function)
-job.schedule_market_jobs()
-job.run()
+# job = Job(runner_function=gainers_losers_alert)
+# job.schedule_market_jobs()
+# job.run()
+
+
+gainers_losers_alert()
