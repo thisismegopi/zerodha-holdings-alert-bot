@@ -120,9 +120,6 @@ def gainers_losers_alert():
         print(f"An error occurred: {str(e)}")
 
 
-# job = Job(runner_function=gainers_losers_alert)
-# job.schedule_market_jobs()
-# job.run()
-
-
-gainers_losers_alert()
+job = Job(runner_function=gainers_losers_alert)
+job.schedule_market_jobs()
+job.run()
